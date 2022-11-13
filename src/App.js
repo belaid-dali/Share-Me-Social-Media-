@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import Login from './components/Login';
+import Home from './container/Home';
+import { gapi } from 'gapi-script';
 
-function App() {
+const clientId= '165867305812-p00l21fejqjem8s0ponn73etgt8r1sle.apps.googleusercontent.com';
+const App = () => {
+  const navigate = useNavigate();
+
+
+useEffect(() => {
+  function start(){
+    gapi.auth2.init({ 
+    clientId:clientId,
+    scope:''
+  })
+};
+  gapi.load('client:auth2', start);
+});
+
+  useEffect(() => {
+    const User = localStorage.getItem('user') !== 'undefined' ? JSON.parse(localStorage.getItem('user')) : localStorage.clear();
+
+    if (!User) navigate('/login');
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <GoogleOAuthProvider clientId= 'clientId'>
+    <Routes>
+      <Route path='login' element={<Login />} />  
+      <Route path='/*' element={<Home />} />
+    </Routes>
+    </GoogleOAuthProvider>
+  )
 }
 
 export default App;
